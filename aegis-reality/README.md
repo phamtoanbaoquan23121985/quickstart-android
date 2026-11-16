@@ -2,6 +2,10 @@
 
 This directory adds a **real-device Android test lane** to the existing Firebase Android Quickstarts repository. It does not alter or replace the Firebase sample applications.
 
+## Service lifecycle notice
+
+Google currently documents Firebase Test Lab as deprecated, with shutdown scheduled for **September 30, 2027**. This integration is therefore a near-term real-device execution lane, not a long-term platform dependency. Keep the device-catalog and test-runner boundaries portable so the backend can migrate to Google Cloud Developer Device Platform before shutdown. See the [Google Cloud migration notice](https://docs.cloud.google.com/sdk/gcloud/reference/firebase/test/android).
+
 ## Initial supported targets
 
 Only these user-authorized targets are eligible:
