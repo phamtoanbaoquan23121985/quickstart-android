@@ -1,4 +1,4 @@
-"""Fail-closed selection of the two approved physical Pixel targets."""
+"""Fail-closed selection of approved physical Pixel targets from Test Lab."""
 from __future__ import annotations
 
 REQUIRED_TARGETS = {"Pixel 10 Pro": "blazer", "Pixel 10 Pro XL": "mustang"}
@@ -6,7 +6,7 @@ REQUIRED_API = "36"
 
 
 def select_supported_devices(catalog: list[dict]) -> list[dict]:
-    """Return exact named targets with API 36 support; reject partial catalogues."""
+    """Select exact physical targets only; reject unknown or partial evidence."""
     selected = []
     for target_name, expected_codename in REQUIRED_TARGETS.items():
         matches = [item for item in catalog if item.get("name") == target_name]
@@ -15,8 +15,16 @@ def select_supported_devices(catalog: list[dict]) -> list[dict]:
         item = matches[0]
         model_id = item.get("id") or item.get("modelId")
         versions = item.get("supportedVersionIds")
-        if not model_id or not isinstance(versions, list):
+        form = item.get("form") or item.get("formFactor")
+        codename = item.get("codename")
+        if not model_id or not isinstance(versions, list) or not form or not codename:
             raise ValueError(f"Incomplete Firebase Test Lab catalog entry: {target_name}")
+        if str(form).upper() != "PHYSICAL":
+            raise ValueError(f"Refusing non-physical device: {target_name}")
+        if codename != expected_codename:
+            raise ValueError(
+                f"Codename mismatch for {target_name}: expected {expected_codename}, got {codename}"
+            )
         if REQUIRED_API not in {str(version) for version in versions}:
             raise ValueError(f"{target_name} does not advertise Android API {REQUIRED_API}")
         selected.append({
@@ -45,7 +53,7 @@ def main() -> int:
         raise ValueError("Unrecognized Firebase Test Lab model catalog format")
     selected = select_supported_devices(catalog)
     args.output.write_text(json.dumps(selected, indent=2) + "\n", encoding="utf-8")
-    print(f"Validated {len(selected)} exact Pixel targets for API {REQUIRED_API}")
+    print(f"Validated {len(selected)} exact physical Pixel targets for API {REQUIRED_API}")
     return 0
 
 
