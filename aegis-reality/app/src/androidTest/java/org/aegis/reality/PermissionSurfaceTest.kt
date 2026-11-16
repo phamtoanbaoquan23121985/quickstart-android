@@ -1,7 +1,9 @@
 package org.aegis.reality
 
 import android.Manifest
+import android.content.ComponentName
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertEquals
@@ -17,5 +19,20 @@ class PermissionSurfaceTest {
             PackageManager.PERMISSION_DENIED,
             context.checkSelfPermission(Manifest.permission.READ_CONTACTS)
         )
+    }
+
+    @Test
+    fun harnessComponentsAreNotExported() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val flags = if (Build.VERSION.SDK_INT >= 33) PackageManager.ComponentInfoFlags.of(0)
+                    else @Suppress("DEPRECATION") PackageManager.GET_META_DATA
+        val activity = context.packageManager.getActivityInfo(
+            ComponentName(context, HarnessActivity::class.java), flags
+        )
+        val service = context.packageManager.getServiceInfo(
+            ComponentName(context, IpcProbeService::class.java), flags
+        )
+        assertEquals(false, activity.exported)
+        assertEquals(false, service.exported)
     }
 }
