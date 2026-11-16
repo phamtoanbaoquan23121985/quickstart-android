@@ -9,18 +9,19 @@ def select_supported_devices(catalog: list[dict]) -> list[dict]:
     """Select exact physical targets only; reject unknown or partial evidence."""
     selected = []
     for target_name, expected_codename in REQUIRED_TARGETS.items():
-        matches = [item for item in catalog if item.get("name") == target_name]
-        if len(matches) != 1:
-            raise ValueError(f"Expected exactly one catalog entry for {target_name}")
-        item = matches[0]
+        named = [item for item in catalog if item.get("name") == target_name]
+        physical = [
+            item for item in named
+            if str(item.get("form") or item.get("formFactor") or "").upper() == "PHYSICAL"
+        ]
+        if len(physical) != 1:
+            raise ValueError(f"Expected exactly one physical catalog entry for {target_name}")
+        item = physical[0]
         model_id = item.get("id") or item.get("modelId")
         versions = item.get("supportedVersionIds")
-        form = item.get("form") or item.get("formFactor")
         codename = item.get("codename")
-        if not model_id or not isinstance(versions, list) or not form or not codename:
+        if not model_id or not isinstance(versions, list) or not codename:
             raise ValueError(f"Incomplete Firebase Test Lab catalog entry: {target_name}")
-        if str(form).upper() != "PHYSICAL":
-            raise ValueError(f"Refusing non-physical device: {target_name}")
         if codename != expected_codename:
             raise ValueError(
                 f"Codename mismatch for {target_name}: expected {expected_codename}, got {codename}"
