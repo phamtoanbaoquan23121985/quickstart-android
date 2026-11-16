@@ -2,6 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+tasks {
+    check.dependsOn("assembleDebugAndroidTest")
+}
+
 android {
     namespace = "org.aegis.reality"
     compileSdk = 37
