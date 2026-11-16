@@ -31,6 +31,7 @@ the sample you wish to run.
 - [Cloud Messaging](messaging/README.md)
 - [Performance Monitoring](perf/README.md)
 - [Cloud Storage for Firebase](storage/README.md)
+- [AEGIS-Ω REALITY — Firebase Test Lab security research harness](aegis-reality/README.md)
 
 ## How to make contributions?
 Please read and follow the steps in the [CONTRIBUTING.md](CONTRIBUTING.md)
