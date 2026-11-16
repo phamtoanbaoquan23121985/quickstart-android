@@ -1,0 +1,14 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application
+        android:allowBackup="false"
+        android:label="AEGIS Reality Test Harness"
+        android:supportsRtl="true">
+        <activity
+            android:name=".HarnessActivity"
+            android:exported="false" />
+        <service
+            android:name=".IpcProbeService"
+            android:exported="false"
+            android:process=":ipc_probe" />
+    </application>
+</manifest>
