@@ -127,5 +127,31 @@ class RealityGateTests(unittest.TestCase):
         self.assertEqual(evaluate_reality_gate(evidence).status, FindingStatus.CANDIDATE)
 
 
+from pipeline import assess_discovery
+
+class PipelineTests(unittest.TestCase):
+    def test_every_discovery_is_gate_classified_before_promotion(self):
+        evidence = Evidence(
+            device_codename="blazer", api_level=36, physical_device=True,
+            scope_authorized=True, repeatable=True, invariant_violated=True,
+            platform_attribution=True, safe_poc=True, independent_review=True,
+            evidence_class="INFERRED",
+        )
+        assessment = assess_discovery({"decision": "unexpected"}, evidence)
+        self.assertEqual(assessment.status, FindingStatus.CANDIDATE)
+        self.assertFalse(assessment.reportable)
+        self.assertFalse(assessment.confirmed_vulnerability)
+
+    def test_gate_reportable_discovery_still_is_not_confirmed_vulnerability(self):
+        evidence = Evidence(
+            device_codename="blazer", api_level=36, physical_device=True,
+            scope_authorized=True, repeatable=True, invariant_violated=True,
+            platform_attribution=True, safe_poc=True, independent_review=True,
+            evidence_class="OBSERVED",
+        )
+        assessment = assess_discovery({"decision": "unexpected"}, evidence)
+        self.assertTrue(assessment.reportable)
+        self.assertFalse(assessment.confirmed_vulnerability)
+
 if __name__ == "__main__":
     unittest.main()
